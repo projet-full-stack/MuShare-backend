@@ -34,9 +34,20 @@ class Playlist
     #[ORM\ManyToMany(targetEntity: Song::class)]
     private Collection $songs;
 
+    #[ORM\ManyToOne(inversedBy: 'playlists')]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?User $owner = null;
+
+    /**
+     * @var Collection<int, Follow>
+     */
+    #[ORM\OneToMany(targetEntity: Follow::class, mappedBy: 'playlist')]
+    private Collection $follows;
+
     public function __construct()
     {
         $this->songs = new ArrayCollection();
+        $this->follows = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -112,6 +123,48 @@ class Playlist
     public function removeSong(Song $song): static
     {
         $this->songs->removeElement($song);
+
+        return $this;
+    }
+
+    public function getOwner(): ?User
+    {
+        return $this->owner;
+    }
+
+    public function setOwner(?User $owner): static
+    {
+        $this->owner = $owner;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Follow>
+     */
+    public function getFollows(): Collection
+    {
+        return $this->follows;
+    }
+
+    public function addFollow(Follow $follow): static
+    {
+        if (!$this->follows->contains($follow)) {
+            $this->follows->add($follow);
+            $follow->setPlaylist($this);
+        }
+
+        return $this;
+    }
+
+    public function removeFollow(Follow $follow): static
+    {
+        if ($this->follows->removeElement($follow)) {
+            // set the owning side to null (unless already changed)
+            if ($follow->getPlaylist() === $this) {
+                $follow->setPlaylist(null);
+            }
+        }
 
         return $this;
     }

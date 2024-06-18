@@ -40,6 +40,10 @@ class Song
     #[ORM\OneToMany(targetEntity: Like::class, mappedBy: 'song')]
     private Collection $likes;
 
+    #[ORM\ManyToOne(inversedBy: 'songs')]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?User $user = null;
+
     public function __construct()
     {
         $this->likes = new ArrayCollection();
@@ -148,6 +152,18 @@ class Song
                 $like->setSong(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getUser(): ?User
+    {
+        return $this->user;
+    }
+
+    public function setUser(?User $user): static
+    {
+        $this->user = $user;
 
         return $this;
     }
