@@ -6,14 +6,14 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Attribute\Route;
 
-class FollowCFollowController extends AbstractController
+class FollowController extends AbstractController
 {
-    #[Route('/follow/c/follow', name: 'app_follow_c_follow')]
+    #[Route('/follow', name: 'app_follow')]
     public function index(): JsonResponse
     {
         return $this->json([
             'message' => 'Welcome to your new controller!',
-            'path' => 'src/Controller/FollowCFollowController.php',
+            'path' => 'src/Controller/FollowController.php',
         ]);
     }
 }

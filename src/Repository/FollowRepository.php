@@ -16,6 +16,18 @@ class FollowRepository extends ServiceEntityRepository
         parent::__construct($registry, Follow::class);
     }
 
+    public function findAllActive($userId, $status): array
+    {
+        return $this->createQueryBuilder('f')
+            ->andWhere('f.user = :userId')
+            ->setParameter('userId', $userId)
+            ->andWhere('f.status = :status')
+            ->setParameter('status', $status)
+            ->orderBy('f.id', 'ASC')
+            ->getQuery()
+            ->getResult();
+    }
+
 //    /**
 //     * @return Follow[] Returns an array of Follow objects
 //     */

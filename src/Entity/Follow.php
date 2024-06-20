@@ -4,6 +4,7 @@ namespace App\Entity;
 
 use App\Repository\FollowRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: FollowRepository::class)]
 class Follow
@@ -15,10 +16,14 @@ class Follow
 
     #[ORM\ManyToOne(inversedBy: 'follows')]
     #[ORM\JoinColumn(nullable: false)]
+    #[Groups(["user", "playlist"])]
     private ?Playlist $playlist = null;
 
     #[ORM\ManyToOne(inversedBy: 'follows')]
     #[ORM\JoinColumn(nullable: false)]
+    /**
+     * @Groups({"follow"})
+     */
     private ?User $user = null;
 
     public function getId(): ?int

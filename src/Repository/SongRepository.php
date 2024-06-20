@@ -16,6 +16,20 @@ class SongRepository extends ServiceEntityRepository
         parent::__construct($registry, Song::class);
     }
 
+    public function findAllActive($userId, $status): array
+    {
+          return $this->createQueryBuilder('s')
+              ->andWhere('s.status = :status')
+              ->setParameter('status', $status)
+              ->andWhere('s.user = :userId')
+              ->setParameter('userId', $userId)
+              ->orderBy('s.id', 'ASC')
+              ->getQuery()
+              ->getResult()
+          ;
+      
+    }
+
     //    /**
     //     * @return Song[] Returns an array of Song objects
     //     */

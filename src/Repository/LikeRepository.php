@@ -16,6 +16,18 @@ class LikeRepository extends ServiceEntityRepository
         parent::__construct($registry, Like::class);
     }
 
+    public function findAllActive($userId, $status): array
+    {
+        return $this->createQueryBuilder('l')
+            ->andWhere('l.user = :userId')
+            ->setParameter('userId', $userId)
+            ->andWhere('l.status = :status')
+            ->setParameter('status', $status)
+            ->orderBy('l.id', 'ASC')
+            ->getQuery()
+            ->getResult();
+    }
+
 //    /**
 //     * @return Like[] Returns an array of Like objects
 //     */

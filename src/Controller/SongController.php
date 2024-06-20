@@ -28,7 +28,7 @@ class SongController extends AbstractController
     public function getAllSongs(SongRepository $songRepository, SerializerInterface $serializer): JsonResponse
     {
         $songs = $songRepository->findAll();
-        $jsonSongs = $serializer->serialize($songs, 'json');
+        $jsonSongs = $serializer->serialize($songs, 'json', ['groups' => 'song']);
         return new JsonResponse($jsonSongs, JsonResponse::HTTP_OK, [], true);
     }
 
@@ -40,18 +40,18 @@ class SongController extends AbstractController
         return new JsonResponse($jsonSong, JsonResponse::HTTP_OK, [], true);
     }
 
-    #[Route('/api/songs', name: 'song.create', methods: ['POST'])]
-    public function createSong(Request $req, EntityManagerInterface $entityManager, SerializerInterface $serializer): JsonResponse
-    {
-        $song = $serializer->deserialize($req->getContent(), Song::class, 'json');
-        $song = $song->setStatus("on");
-        $song->setCreatedAt(new \DateTime());
-        $song->setUpdatedAt(new \DateTime());
-        $entityManager->persist($song);
-        $entityManager->flush();
-        $jsonSong = $serializer->serialize($song, 'json');
-        return new JsonResponse($jsonSong, JsonResponse::HTTP_CREATED, [], true);
-    }
+    // #[Route('/api/songs', name: 'song.create', methods: ['POST'])]
+    // public function createSong(Request $req, EntityManagerInterface $entityManager, SerializerInterface $serializer): JsonResponse
+    // {
+    //     $song = $serializer->deserialize($req->getContent(), Song::class, 'json');
+    //     $song = $song->setStatus("on");
+    //     $song->setCreatedAt(new \DateTime());
+    //     $song->setUpdatedAt(new \DateTime());
+    //     $entityManager->persist($song);
+    //     $entityManager->flush();
+    //     $jsonSong = $serializer->serialize($song, 'json');
+    //     return new JsonResponse($jsonSong, JsonResponse::HTTP_CREATED, [], true);
+    // }
 
     #[Route('/api/songs/{song}', name: 'song.update', methods: ['PUT'])]
     public function updateSong(Request $req, Song $song, SerializerInterface $serializer, EntityManagerInterface $entityManager): JsonResponse

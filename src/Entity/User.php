@@ -7,6 +7,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 class User
@@ -14,48 +15,62 @@ class User
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(["user", "like"])]
     private ?int $id = null;
 
     #[ORM\Column(length: 50)]
+    #[Groups(["user", "like"])]
     private ?string $username = null;
 
     #[ORM\Column(length: 255)]
+    #[Groups(["user"])]
     private ?string $email = null;
 
     #[ORM\Column(length: 255)]
+    #[Groups(["user"])]
     private ?string $password = null;
 
     #[ORM\Column(length: 10)]
+    #[Groups(["user"])]
     private ?string $status = null;
 
     #[ORM\Column(type: Types::DATETIMETZ_MUTABLE)]
+    #[Groups(["user"])]
     private ?\DateTimeInterface $createdAt = null;
 
     #[ORM\Column(type: Types::DATETIMETZ_MUTABLE)]
+    #[Groups(["user"])]
     private ?\DateTimeInterface $updatedAt = null;
 
     /**
      * @var Collection<int, Like>
+     * @Groups({"user"})
      */
     #[ORM\OneToMany(targetEntity: Like::class, mappedBy: 'user')]
+    #[Groups(["user"])]
     private Collection $likes;
 
     /**
      * @var Collection<int, Song>
      */
     #[ORM\OneToMany(targetEntity: Song::class, mappedBy: 'user')]
+    #[Groups(["user"])]
     private Collection $songs;
 
     /**
      * @var Collection<int, Playlist>
+     * @Groups({"user"})
      */
     #[ORM\OneToMany(targetEntity: Playlist::class, mappedBy: 'owner')]
+    #[Groups(["user"])]
     private Collection $playlists;
 
     /**
      * @var Collection<int, Follow>
+     * @Groups({"user"})
      */
     #[ORM\OneToMany(targetEntity: Follow::class, mappedBy: 'user')]
+    #[Groups(["user"])]
     private Collection $follows;
 
     public function __construct()

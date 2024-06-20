@@ -28,7 +28,7 @@ class PlaylistController extends AbstractController
     public function getAllSongs(PlaylistRepository $playlistRepository, SerializerInterface $serializer): JsonResponse
     {
         $playlist = $playlistRepository->findAll();
-        $jsonPlaylist = $serializer->serialize($playlist, 'json');
+        $jsonPlaylist = $serializer->serialize($playlist, 'json', ['groups' => 'playlist']);
         return new JsonResponse($jsonPlaylist, JsonResponse::HTTP_OK, [], true);
     }
 
@@ -40,18 +40,18 @@ class PlaylistController extends AbstractController
         return new JsonResponse($jsonPlaylist, JsonResponse::HTTP_OK, [], true);
     }
 
-    #[Route('/api/playlist', name: 'playlist.create', methods: ['POST'])]
-    public function createSong(Request $req, EntityManagerInterface $entityManager, SerializerInterface $serializer): JsonResponse
-    {
-        $playlist = $serializer->deserialize($req->getContent(), Playlist::class, 'json');
-        $playlist = $playlist->setStatus("on");
-        $playlist->setCreatedAt(new \DateTime());
-        $playlist->setUpdatedAt(new \DateTime());
-        $entityManager->persist($playlist);
-        $entityManager->flush();
-        $jsonPlaylist = $serializer->serialize($playlist, 'json');
-        return new JsonResponse($jsonPlaylist, JsonResponse::HTTP_CREATED, [], true);
-    }
+    // #[Route('/api/playlist', name: 'playlist.create', methods: ['POST'])]
+    // public function createSong(Request $req, EntityManagerInterface $entityManager, SerializerInterface $serializer): JsonResponse
+    // {
+    //     $playlist = $serializer->deserialize($req->getContent(), Playlist::class, 'json');
+    //     $playlist = $playlist->setStatus("on");
+    //     $playlist->setCreatedAt(new \DateTime());
+    //     $playlist->setUpdatedAt(new \DateTime());
+    //     $entityManager->persist($playlist);
+    //     $entityManager->flush();
+    //     $jsonPlaylist = $serializer->serialize($playlist, 'json');
+    //     return new JsonResponse($jsonPlaylist, JsonResponse::HTTP_CREATED, [], true);
+    // }
 
     #[Route('/api/playlist/{playlist}', name: 'playlist.update', methods: ['PUT'])]
     public function updateSong(Request $req, Playlist $playlist, SerializerInterface $serializer, EntityManagerInterface $entityManager): JsonResponse

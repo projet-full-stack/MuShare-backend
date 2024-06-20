@@ -7,6 +7,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: PlaylistRepository::class)]
 class Playlist
@@ -14,34 +15,47 @@ class Playlist
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(["user", "playlist"])]
     private ?int $id = null;
 
     #[ORM\Column(length: 100)]
+    #[Groups(["user", "playlist"])]
     private ?string $title = null;
 
     #[ORM\Column(length: 25)]
+    #[Groups(["playlist"])]
     private ?string $status = null;
 
     #[ORM\Column(type: Types::DATETIMETZ_MUTABLE)]
+    #[Groups(["playlist"])]
     private ?\DateTimeInterface $createdAt = null;
 
     #[ORM\Column(type: Types::DATETIMETZ_MUTABLE)]
+    #[Groups(["playlist"])]
     private ?\DateTimeInterface $updatedAt = null;
 
     /**
      * @var Collection<int, Song>
+     * @Groups({"playlist"})
      */
     #[ORM\ManyToMany(targetEntity: Song::class)]
+    #[Groups(["playlist"])]
     private Collection $songs;
 
-    #[ORM\ManyToOne(inversedBy: 'playlists')]
+    /**
+     * @Groups({"playlist"})
+     */
+    #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'playlists')]
+    #[Groups(["playlist"])]
     #[ORM\JoinColumn(nullable: false)]
     private ?User $owner = null;
 
     /**
      * @var Collection<int, Follow>
+     * @Groups({"playlist"})
      */
     #[ORM\OneToMany(targetEntity: Follow::class, mappedBy: 'playlist')]
+    #[Groups(["playlist"])]
     private Collection $follows;
 
     public function __construct()

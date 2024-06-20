@@ -19,6 +19,21 @@ class PlaylistRepository extends ServiceEntityRepository
 //    /**
 //     * @return Playlist[] Returns an array of Playlist objects
 //     */
+
+      public function findAllActive($userId, $status): array
+      {
+            return $this->createQueryBuilder('p')
+                ->andWhere('p.user = :userId')
+                ->setParameter('userId', $userId)
+                ->andWhere('p.status = :status')
+                ->setParameter('status', $status)
+                ->orderBy('p.id', 'ASC')
+                ->getQuery()
+                ->getResult()
+            ;
+        
+      }
+
 //    public function findByExampleField($value): array
 //    {
 //        return $this->createQueryBuilder('p')
