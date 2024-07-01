@@ -15,11 +15,11 @@ class User
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(["user", "like"])]
+    #[Groups(["user", "like", "playlist", "follow"])]
     private ?int $id = null;
 
     #[ORM\Column(length: 50)]
-    #[Groups(["user", "like"])]
+    #[Groups(["user", "like", "playlist", "follow"])]
     private ?string $username = null;
 
     #[ORM\Column(length: 255)]

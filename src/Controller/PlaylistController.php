@@ -36,7 +36,7 @@ class PlaylistController extends AbstractController
     public function getOneSong($playlistId, PlaylistRepository $playlistRepository, SerializerInterface $serializer): JsonResponse
     {
         $song = $playlistRepository->find($playlistId);
-        $jsonPlaylist = $serializer->serialize($song, 'json');
+        $jsonPlaylist = $serializer->serialize($song, 'json', ['groups' => 'playlist']);
         return new JsonResponse($jsonPlaylist, JsonResponse::HTTP_OK, [], true);
     }
 

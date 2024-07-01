@@ -15,11 +15,11 @@ class Song
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(["song", "user", "like"])]
+    #[Groups(["song", "user", "like", "playlist"])]
     private ?int $id = null;
 
     #[ORM\Column(length: 100)]
-    #[Groups(["song", "user", "like"],)]
+    #[Groups(["song", "user", "like", "playlist"],)]
     private ?string $title = null;
 
     #[ORM\Column(length: 25)]

@@ -17,10 +17,11 @@ class Follow
 
     #[ORM\ManyToOne(inversedBy: 'follows')]
     #[ORM\JoinColumn(nullable: false)]
-    #[Groups(["user", "playlist"])]
+    #[Groups(["user"])]
     private ?Playlist $playlist = null;
 
     #[ORM\ManyToOne(inversedBy: 'follows')]
+    #[Groups(["playlist"])]
     #[ORM\JoinColumn(nullable: false)]
     /**
      * @Groups({"follow"})
