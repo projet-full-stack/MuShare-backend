@@ -23,7 +23,7 @@ class PlaylistRepository extends ServiceEntityRepository
       public function findAllActive($userId, $status): array
       {
             return $this->createQueryBuilder('p')
-                ->andWhere('p.user = :userId')
+                ->andWhere('p.owner = :userId')
                 ->setParameter('userId', $userId)
                 ->andWhere('p.status = :status')
                 ->setParameter('status', $status)
