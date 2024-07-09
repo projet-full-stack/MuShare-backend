@@ -37,7 +37,7 @@ class Song
     #[ORM\Column(length: 255)]
     #[Groups(["song"])]
     private ?string $path = null;
-
+    #[Groups(["song", "playlist"])]
     #[ORM\Column(length: 50)]
     
     private ?string $author = null;

@@ -30,6 +30,16 @@ class SongRepository extends ServiceEntityRepository
       
     }
 
+    public function findLastTenSong(): array
+    {
+        return $this->createQueryBuilder('s')
+            ->orderBy('s.id', 'DESC')
+            ->setMaxResults(10)
+            ->getQuery()
+            ->getResult()
+        ;
+    }
+
     //    /**
     //     * @return Song[] Returns an array of Song objects
     //     */
