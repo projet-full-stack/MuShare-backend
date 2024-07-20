@@ -2,9 +2,9 @@
 
 namespace App\Controller;
 
+use App\Entity\DownloadedFile;
 use App\Entity\Song;
 use App\Repository\SongRepository;
-use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -12,6 +12,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 use Symfony\Component\Serializer\SerializerInterface;
+use DateTime;
 
 class SongController extends AbstractController
 {
@@ -40,18 +41,27 @@ class SongController extends AbstractController
         return new JsonResponse($jsonSong, JsonResponse::HTTP_OK, [], true);
     }
 
-    // #[Route('/api/songs', name: 'song.create', methods: ['POST'])]
-    // public function createSong(Request $req, EntityManagerInterface $entityManager, SerializerInterface $serializer): JsonResponse
-    // {
-    //     $song = $serializer->deserialize($req->getContent(), Song::class, 'json');
-    //     $song = $song->setStatus("on");
-    //     $song->setCreatedAt(new \DateTime());
-    //     $song->setUpdatedAt(new \DateTime());
-    //     $entityManager->persist($song);
-    //     $entityManager->flush();
-    //     $jsonSong = $serializer->serialize($song, 'json');
-    //     return new JsonResponse($jsonSong, JsonResponse::HTTP_CREATED, [], true);
-    // }
+    #[Route('/api/songs', name: 'song.create', methods: ['POST'])]
+    public function createSong(Request $req, EntityManagerInterface $entityManager, SerializerInterface $serializer): JsonResponse
+    {
+        $file = new DownloadedFile();
+        $files = $req->files->get('file');
+        $file->setFile($files);
+
+        $file->setMimeType($files->getClientMimeType());
+        $file->setRealName($files->getClientOriginalName());
+        $file->setPublicPath('files/songs');
+        $file->setUpdatedAt(new DateTime());
+        $file->setCreatedAt(new DateTime());
+        $file->setStatus("on");
+        $file->setFileSize(0);
+        $entityManager->persist($file);
+        $entityManager->flush();
+
+        
+        $jsonSong = $serializer->serialize($file, 'json');
+        return new JsonResponse($jsonSong, JsonResponse::HTTP_CREATED, [], true);
+    }
 
     #[Route('/api/songs/{song}', name: 'song.update', methods: ['PUT'])]
     public function updateSong(Request $req, Song $song, SerializerInterface $serializer, EntityManagerInterface $entityManager): JsonResponse

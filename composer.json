@@ -23,7 +23,9 @@
         "symfony/property-info": "7.0.*",
         "symfony/runtime": "7.0.*",
         "symfony/serializer": "7.0.*",
-        "symfony/yaml": "7.0.*"
+        "symfony/translation": "7.0.*",
+        "symfony/yaml": "7.0.*",
+        "vich/uploader-bundle": "^2.4"
     },
     "config": {
         "allow-plugins": {
