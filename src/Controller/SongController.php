@@ -33,6 +33,14 @@ class SongController extends AbstractController
         return new JsonResponse($jsonSongs, JsonResponse::HTTP_OK, [], true);
     }
 
+    #[Route('/api/songs/last', name: 'song.getLastTen', methods: ['GET'])]
+    public function getLastTenSongs(SongRepository $songRepository, SerializerInterface $serializer): JsonResponse
+    {
+        $songs = $songRepository->findLastTenSong();
+        $jsonSongs = $serializer->serialize($songs, 'json', ['groups' => 'song']);
+        return new JsonResponse($jsonSongs, JsonResponse::HTTP_OK, [], true);
+    }
+
     #[Route('/api/songs/{songId}', name: 'song.get', methods: ['GET'])]
     public function getOneSong($songId, SongRepository $songRepository, SerializerInterface $serializer): JsonResponse
     {
