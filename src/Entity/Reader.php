@@ -13,7 +13,7 @@ class Reader
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\Column(length: 4095)]
+    #[ORM\Column(length: 100000)]
     private ?string $htmlCode = null;
 
     public function getId(): ?int
