@@ -12,14 +12,17 @@ use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Persistence\ObjectManager;
 use Faker\Factory;
 use Faker\Generator;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 class AppFixtures extends Fixture
 {
 
     private Generator $faker;
 
-    public function __construct() {
+    private UserPasswordHasherInterface $userPasswordHasher; 
+    public function __construct(UserPasswordHasherInterface $userPasswordHasher) {
         $this->faker = Factory::create("fr_FR");
+        $this->userPasswordHasher = $userPasswordHasher;
     }
     public function load(ObjectManager $manager): void
     {
@@ -29,7 +32,11 @@ class AppFixtures extends Fixture
             $user = new User();
             $created = $this->faker->dateTime();
             $updated = $this->faker->dateTimeBetween($created, 'now');
-            $user->setUsername($this->faker->userName())->setEmail($this->faker->email())->setPassword($this->faker->password())->setCreatedAt($created)->setUpdatedAt($updated)->setStatus("on");
+            $username = $this->faker->userName();
+            $email = $this->faker->email();
+            $password = $this->faker->password();
+
+            $user->setUsername($email."|".$password)->setEmail($email)->setPassword($this->userPasswordHasher->hashPassword($user, $password))->setCreatedAt($created)->setUpdatedAt($updated)->setStatus("on");
             array_push($users, $user);
             $manager->persist($user);
         }
@@ -40,8 +47,8 @@ class AppFixtures extends Fixture
             $song = new Song();
             $created = $this->faker->dateTime();
             $updated = $this->faker->dateTimeBetween($created, 'now');
-            $song->setUser($users[array_rand($users)]);
-            $song->setTitle($this->faker->word())->setStatus("on")->setCreatedAt($created)->setUpdatedAt($updated)->setAuthor($this->faker->name())->setPath($this->faker->imageUrl());
+            $song->setOwner($users[array_rand($users)]);
+            $song->setTitle($this->faker->word())->setStatus("on")->setCreatedAt($created)->setUpdatedAt($updated)->setAuthor($this->faker->name());
             array_push($songs, $song);
             $manager->persist($song);
         }
@@ -54,7 +61,7 @@ class AppFixtures extends Fixture
             $updated = $this->faker->dateTimeBetween($created, 'now');
             shuffle($songs);
             $fiveRandomElements = array_slice($songs, 0, 5);
-            $playlist->setOwner($users[array_rand($users)]);
+            $playlist->setUser($users[array_rand($users)]);
             $playlist->setTitle($this->faker->word())->setStatus("on")->setCreatedAt($created)->setUpdatedAt($updated)->addSong($fiveRandomElements[0])->addSong($fiveRandomElements[1])->addSong($fiveRandomElements[2])->addSong($fiveRandomElements[3])->addSong($fiveRandomElements[4]);
             array_push($playlists, $playlist);
             $manager->persist($playlist);

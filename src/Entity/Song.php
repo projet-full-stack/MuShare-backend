@@ -34,9 +34,6 @@ class Song
     #[Groups(["song"])]
     private ?\DateTimeInterface $updatedAt = null;
 
-    #[ORM\Column(length: 255)]
-    #[Groups(["song"])]
-    private ?string $path = null;
     #[Groups(["song", "playlist"])]
     #[ORM\Column(length: 50)]
     
@@ -54,7 +51,7 @@ class Song
 
     #[ORM\ManyToOne(inversedBy: 'songs')]
     #[ORM\JoinColumn(nullable: false)]
-    private ?User $user = null;
+    private ?User $owner = null;
 
     public function __construct()
     {
@@ -173,14 +170,14 @@ class Song
         return $this;
     }
 
-    public function getUser(): ?User
+    public function getOwner(): ?User
     {
-        return $this->user;
+        return $this->owner;
     }
 
-    public function setUser(?User $user): static
+    public function setOwner(?User $owner): static
     {
-        $this->user = $user;
+        $this->owner = $owner;
 
         return $this;
     }

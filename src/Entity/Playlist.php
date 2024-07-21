@@ -52,7 +52,7 @@ class Playlist
 
     #[ORM\ManyToOne(inversedBy: 'playlists')]
     #[ORM\JoinColumn(nullable: false)]
-    private ?User $owner = null;
+    private ?User $user = null;
 
     public function __construct()
     {
@@ -167,14 +167,14 @@ class Playlist
         return $this;
     }
 
-    public function getOwner(): ?User
+    public function getUser(): ?User
     {
-        return $this->owner;
+        return $this->user;
     }
 
-    public function setOwner(?User $owner): static
+    public function setUser(?User $user): static
     {
-        $this->owner = $owner;
+        $this->user = $user;
 
         return $this;
     }
