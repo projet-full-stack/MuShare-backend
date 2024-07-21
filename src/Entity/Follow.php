@@ -20,14 +20,6 @@ class Follow
     #[Groups(["user"])]
     private ?Playlist $playlist = null;
 
-    #[ORM\ManyToOne(inversedBy: 'follows')]
-    #[Groups(["playlist"])]
-    #[ORM\JoinColumn(nullable: false)]
-    /**
-     * @Groups({"follow"})
-     */
-    private ?User $user = null;
-
     #[ORM\Column(type: Types::DATETIMETZ_MUTABLE)]
     private ?\DateTimeInterface $updatedAt = null;
 
@@ -36,6 +28,10 @@ class Follow
 
     #[ORM\Column(length: 10)]
     private ?string $status = null;
+
+    #[ORM\ManyToOne(inversedBy: 'follows')]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?User $user = null;
 
     public function getId(): ?int
     {
@@ -50,18 +46,6 @@ class Follow
     public function setPlaylist(?Playlist $playlist): static
     {
         $this->playlist = $playlist;
-
-        return $this;
-    }
-
-    public function getUser(): ?User
-    {
-        return $this->user;
-    }
-
-    public function setUser(?User $user): static
-    {
-        $this->user = $user;
 
         return $this;
     }
@@ -98,6 +82,18 @@ class Follow
     public function setStatus(string $status): static
     {
         $this->status = $status;
+
+        return $this;
+    }
+
+    public function getUser(): ?User
+    {
+        return $this->user;
+    }
+
+    public function setUser(?User $user): static
+    {
+        $this->user = $user;
 
         return $this;
     }

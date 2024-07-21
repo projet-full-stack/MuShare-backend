@@ -43,20 +43,16 @@ class Playlist
     private Collection $songs;
 
     /**
-     * @Groups({"playlist"})
-     */
-    #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'playlists')]
-    #[Groups(["playlist"])]
-    #[ORM\JoinColumn(nullable: false)]
-    private ?User $owner = null;
-
-    /**
      * @var Collection<int, Follow>
      * @Groups({"playlist"})
      */
     #[ORM\OneToMany(targetEntity: Follow::class, mappedBy: 'playlist')]
     #[Groups(["playlist"])]
     private Collection $follows;
+
+    #[ORM\ManyToOne(inversedBy: 'playlists')]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?User $owner = null;
 
     public function __construct()
     {
@@ -141,18 +137,6 @@ class Playlist
         return $this;
     }
 
-    public function getOwner(): ?User
-    {
-        return $this->owner;
-    }
-
-    public function setOwner(?User $owner): static
-    {
-        $this->owner = $owner;
-
-        return $this;
-    }
-
     /**
      * @return Collection<int, Follow>
      */
@@ -179,6 +163,18 @@ class Playlist
                 $follow->setPlaylist(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getOwner(): ?User
+    {
+        return $this->owner;
+    }
+
+    public function setOwner(?User $owner): static
+    {
+        $this->owner = $owner;
 
         return $this;
     }

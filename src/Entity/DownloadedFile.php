@@ -47,6 +47,10 @@ class DownloadedFile
 
     #[ORM\Column(length: 255)]
     private ?string $fileSize = null;
+
+    #[ORM\OneToOne(inversedBy: 'downloadedFile', cascade: ['persist', 'remove'])]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?Song $song = null;
     public function getFile(): ?File
     {
         return $this->file; 
@@ -155,6 +159,18 @@ class DownloadedFile
     public function setFileSize(string $fileSize): static
     {
         $this->fileSize = $fileSize;
+
+        return $this;
+    }
+
+    public function getSong(): ?Song
+    {
+        return $this->song;
+    }
+
+    public function setSong(Song $song): static
+    {
+        $this->song = $song;
 
         return $this;
     }

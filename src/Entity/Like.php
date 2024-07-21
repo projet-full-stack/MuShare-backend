@@ -36,10 +36,6 @@ class Like
 
     #[ORM\ManyToOne(inversedBy: 'likes')]
     #[ORM\JoinColumn(nullable: false)]
-    /*
-     * @Groups({"like"})
-     */
-    #[Groups(["like"])]
     private ?User $user = null;
 
     public function getId(): ?int
@@ -106,4 +102,5 @@ class Like
 
         return $this;
     }
+
 }

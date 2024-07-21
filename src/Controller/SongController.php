@@ -52,6 +52,15 @@ class SongController extends AbstractController
     #[Route('/api/songs', name: 'song.create', methods: ['POST'])]
     public function createSong(Request $req, EntityManagerInterface $entityManager, SerializerInterface $serializer): JsonResponse
     {
+        $song = new Song();
+        $song->setCreatedAt(new DateTime());
+        $song->setUpdatedAt(new DateTime());
+        $song->setStatus("on");
+        $song->setTitle($req->request->get('title'));
+        $song->setAuthor($req->request->get('author'));
+        
+        $entityManager->persist($song);
+
         $file = new DownloadedFile();
         $files = $req->files->get('file');
         $file->setFile($files);
@@ -63,7 +72,9 @@ class SongController extends AbstractController
         $file->setCreatedAt(new DateTime());
         $file->setStatus("on");
         $file->setFileSize(0);
+        $file->setSong($song);
         $entityManager->persist($file);
+
         $entityManager->flush();
 
         

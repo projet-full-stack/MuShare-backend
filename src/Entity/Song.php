@@ -49,12 +49,11 @@ class Song
     #[Groups(["song"])]
     private Collection $likes;
 
+    #[ORM\OneToOne(mappedBy: 'song', cascade: ['persist', 'remove'])]
+    private ?DownloadedFile $downloadedFile = null;
+
     #[ORM\ManyToOne(inversedBy: 'songs')]
     #[ORM\JoinColumn(nullable: false)]
-    #[Groups(["song"])]
-    /**
-     * @Groups({"song"})
-     */
     private ?User $user = null;
 
     public function __construct()
@@ -115,18 +114,6 @@ class Song
         return $this;
     }
 
-    public function getPath(): ?string
-    {
-        return $this->path;
-    }
-
-    public function setPath(string $path): static
-    {
-        $this->path = $path;
-
-        return $this;
-    }
-
     public function getAuthor(): ?string
     {
         return $this->author;
@@ -165,6 +152,23 @@ class Song
                 $like->setSong(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getDownloadedFile(): ?DownloadedFile
+    {
+        return $this->downloadedFile;
+    }
+
+    public function setDownloadedFile(DownloadedFile $downloadedFile): static
+    {
+        // set the owning side of the relation if necessary
+        if ($downloadedFile->getSong() !== $this) {
+            $downloadedFile->setSong($this);
+        }
+
+        $this->downloadedFile = $downloadedFile;
 
         return $this;
     }
