@@ -11,13 +11,14 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 use Symfony\Component\Serializer\SerializerInterface;
 use DateTime;
 
 class SongController extends AbstractController
 {
-    #[Route('/song', name: 'app_song')]
+    #[Route('/', name: 'app_song')]
     public function index(): JsonResponse
     {
         return $this->json([
@@ -43,15 +44,19 @@ class SongController extends AbstractController
     }
 
     #[Route('/api/songs/{songId}', name: 'song.get', methods: ['GET'])]
-    public function getOneSong($songId, SongRepository $songRepository, SerializerInterface $serializer): JsonResponse
+    public function getOneSong($songId, SongRepository $songRepository,UrlGeneratorInterface $urlGenerator, SerializerInterface $serializer): JsonResponse
     {
         $song = $songRepository->find($songId);
-        $jsonSong = $serializer->serialize($song, 'json');
-        return new JsonResponse($jsonSong, JsonResponse::HTTP_OK, [], true);
+        $downloadedFile = $song->getDownloadedFile();
+        $location = $downloadedFile->getPublicPath() . '/' . $downloadedFile->getRealPath();
+        $location = $urlGenerator->generate("app_song", [], UrlGeneratorInterface::ABSOLUTE_URL);
+        $location = $location . str_replace("/public/", "", $downloadedFile->getPublicPath() . '/' . $downloadedFile->getRealPath());
+        $jsonSong = $serializer->serialize($song, 'json', ['groups' => 'song']);
+        return new JsonResponse($jsonSong, JsonResponse::HTTP_OK, ["Location" => $location], true);
     }
 
     #[Route('/api/songs', name: 'song.create', methods: ['POST'])]
-    public function createSong(Request $req, EntityManagerInterface $entityManager, UserRepository $userRepository, SerializerInterface $serializer): JsonResponse
+    public function createSong(Request $req, EntityManagerInterface $entityManager,UrlGeneratorInterface $urlGenerator, UserRepository $userRepository, SerializerInterface $serializer): JsonResponse
     {
         $file = new DownloadedFile();
         $song = new Song();
@@ -84,8 +89,12 @@ class SongController extends AbstractController
         
         $entityManager->flush();
 
+        $location = $file->getPublicPath() . '/' . $file->getRealPath();
+        $location = $urlGenerator->generate("app_song", [], UrlGeneratorInterface::ABSOLUTE_URL);
+        $location = $location . str_replace("/public/", "", $file->getPublicPath() . '/' . $file->getRealPath());
+
         $jsonSong = $serializer->serialize($song, 'json', ['groups' => 'song']);   
-        return new JsonResponse($jsonSong, JsonResponse::HTTP_CREATED, [], true);
+        return new JsonResponse($jsonSong, JsonResponse::HTTP_CREATED, ["Location" => $location], true);
     }
 
     #[Route('/api/songs/{song}', name: 'song.update', methods: ['PUT'])]
