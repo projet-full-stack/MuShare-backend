@@ -8,6 +8,7 @@ use App\Repository\DownloadedFileRepository;
 use Symfony\Component\HttpFoundation\File\File;
 use Vich\UploaderBundle\Mapping\Annotation as Vich;
 use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Serializer\Annotation\Ignore;
 
 #[Vich\Uploadable]
 #[ORM\Entity(repositoryClass: DownloadedFileRepository::class)]
@@ -16,40 +17,49 @@ class DownloadedFile
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups([ "downloadedFile", "song"])]
     private ?int $id = null;
 
-    #[Groups([ "getSongs"])]
+
     #[ORM\Column(length: 255)]
+    #[Groups([ "downloadedFile", "song"])]
     private ?string $realPath = null;
     
-    #[Groups([ "getSongs"])]
     #[ORM\Column(length: 255)]
+    #[Groups([ "downloadedFile"])]
     private ?string $publicPath = null;
 
     #[ORM\Column(length: 255)]
+    #[Groups([ "downloadedFile"])]
     private ?string $mimeType = null;
 
     #[ORM\Column(length: 24)]
+    #[Groups([ "downloadedFile"])]
     private ?string $status = null;
 
     #[ORM\Column(type: Types::DATETIMETZ_MUTABLE)]
+    #[Groups([ "downloadedFile"])]
     private ?\DateTimeInterface $createdAt = null;
 
     #[ORM\Column(type: Types::DATETIMETZ_MUTABLE)]
+    #[Groups([ "downloadedFile"])]
     private ?\DateTimeInterface $updatedAt = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups([ "getSongs"])]
+    #[Groups([ "downloadedFile"])]
     private ?string $realName = null;
 
     #[Vich\UploadableField(mapping:"uploadedFiles", fileNameProperty:'realPath', size:"fileSize")]
+    #[Groups([ "downloadedFile"])]
     private ?File $file = null;
 
     #[ORM\Column(length: 255)]
+    #[Groups([ "downloadedFile"])]
     private ?string $fileSize = null;
 
     #[ORM\OneToOne(inversedBy: 'downloadedFile', cascade: ['persist', 'remove'])]
     #[ORM\JoinColumn(nullable: false)]
+    #[Groups([ "downloadedFile"])]
     private ?Song $song = null;
     public function getFile(): ?File
     {

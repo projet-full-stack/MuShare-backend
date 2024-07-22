@@ -34,8 +34,8 @@ class Song
     #[Groups(["song"])]
     private ?\DateTimeInterface $updatedAt = null;
 
-    #[Groups(["song", "playlist"])]
     #[ORM\Column(length: 50)]
+    #[Groups(["song"])]
     
     private ?string $author = null;
 
@@ -47,10 +47,12 @@ class Song
     private Collection $likes;
 
     #[ORM\OneToOne(mappedBy: 'song', cascade: ['persist', 'remove'])]
+    #[Groups(["song"])]
     private ?DownloadedFile $downloadedFile = null;
 
     #[ORM\ManyToOne(inversedBy: 'songs')]
     #[ORM\JoinColumn(nullable: false)]
+    #[Groups(["song"])]
     private ?User $owner = null;
 
     public function __construct()

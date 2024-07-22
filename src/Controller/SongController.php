@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\DownloadedFile;
 use App\Entity\Song;
 use App\Repository\SongRepository;
+use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -50,21 +51,24 @@ class SongController extends AbstractController
     }
 
     #[Route('/api/songs', name: 'song.create', methods: ['POST'])]
-    public function createSong(Request $req, EntityManagerInterface $entityManager, SerializerInterface $serializer): JsonResponse
+    public function createSong(Request $req, EntityManagerInterface $entityManager, UserRepository $userRepository, SerializerInterface $serializer): JsonResponse
     {
+        $file = new DownloadedFile();
         $song = new Song();
+
         $song->setCreatedAt(new DateTime());
         $song->setUpdatedAt(new DateTime());
         $song->setStatus("on");
         $song->setTitle($req->request->get('title'));
         $song->setAuthor($req->request->get('author'));
+        $owner = $userRepository->find($req->request->get('owner'));
+        $song->setOwner($owner);
+        $song->setDownloadedFile($file);
         
-        $entityManager->persist($song);
-
-        $file = new DownloadedFile();
+        
         $files = $req->files->get('file');
         $file->setFile($files);
-
+        
         $file->setMimeType($files->getClientMimeType());
         $file->setRealName($files->getClientOriginalName());
         $file->setPublicPath('files/songs');
@@ -73,12 +77,14 @@ class SongController extends AbstractController
         $file->setStatus("on");
         $file->setFileSize(0);
         $file->setSong($song);
-        $entityManager->persist($file);
+        $file->setRealPath($file->getPublicPath() . '/' . $file->getRealName() . '.' . $file->getFile()->guessExtension());
 
+        $entityManager->persist($file);
+        $entityManager->persist($song);
+        
         $entityManager->flush();
 
-        
-        $jsonSong = $serializer->serialize($file, 'json');
+        $jsonSong = $serializer->serialize($song, 'json', ['groups' => 'song']);   
         return new JsonResponse($jsonSong, JsonResponse::HTTP_CREATED, [], true);
     }
 

@@ -6,6 +6,7 @@ use App\Repository\LikeRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Serializer\Annotation\Ignore;
 
 #[ORM\Entity(repositoryClass: LikeRepository::class)]
 #[ORM\Table(name: '`like`')]
@@ -14,7 +15,7 @@ class Like
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(["like", "user"])]
+    #[Groups(["like", "user", "song"])]
     private ?int $id = null;
 
     #[ORM\ManyToOne(inversedBy: 'likes')]
@@ -36,6 +37,7 @@ class Like
 
     #[ORM\ManyToOne(inversedBy: 'likes')]
     #[ORM\JoinColumn(nullable: false)]
+    #[Groups(["like"])]
     private ?User $user = null;
 
 

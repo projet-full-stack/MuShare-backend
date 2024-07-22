@@ -9,6 +9,8 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Serializer\Annotation\Ignore;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[ORM\UniqueConstraint(name: 'UNIQ_IDENTIFIER_USERNAME', fields: ['username'])]
@@ -17,57 +19,70 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(["user", "like", "playlist", "follow", "song"])]
     private ?int $id = null;
 
     #[ORM\Column(length: 180)]
+    #[Groups(["user"])]
     private ?string $email = null;
 
     /**
      * @var list<string> The user roles
      */
     #[ORM\Column]
+    #[Groups(["user"])]
     private array $roles = [];
 
     /**
      * @var string The hashed password
      */
     #[ORM\Column]
+    #[Groups(["user"])]
     private ?string $password = null;
 
     #[ORM\Column(length: 50)]
+    #[Groups(["user", "like", "playlist", "follow", "song"])]
     private ?string $username = null;
 
     /**
      * @var Collection<int, Like>
      */
     #[ORM\OneToMany(targetEntity: Like::class, mappedBy: 'user', orphanRemoval: true)]
+    #[Groups(["user"])]
+    #[Ignore]
     private Collection $likes;
 
     /**
      * @var Collection<int, Follow>
      */
     #[ORM\OneToMany(targetEntity: Follow::class, mappedBy: 'user', orphanRemoval: true)]
+    #[Groups(["user"])]
     private Collection $follows;
 
     /**
      * @var Collection<int, Playlist>
      */
     #[ORM\OneToMany(targetEntity: Playlist::class, mappedBy: 'user')]
+    #[Groups(["user"])]
     private Collection $playlists;
 
     /**
      * @var Collection<int, Song>
      */
     #[ORM\OneToMany(targetEntity: Song::class, mappedBy: 'owner')]
+    #[Groups(["user"])]
     private Collection $songs;
 
     #[ORM\Column(length: 10)]
+    #[Groups(["user"])]
     private ?string $status = null;
 
     #[ORM\Column(type: Types::DATETIMETZ_MUTABLE)]
+    #[Groups(["user"])]
     private ?\DateTimeInterface $createdAt = null;
 
     #[ORM\Column(type: Types::DATETIMETZ_MUTABLE)]
+    #[Groups(["user"])]
     private ?\DateTimeInterface $updatedAt = null;
 
     public function __construct()
