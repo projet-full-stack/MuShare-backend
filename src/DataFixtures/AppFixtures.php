@@ -97,33 +97,36 @@ class AppFixtures extends Fixture
         //Reader
         $reader = new Reader();
         $reader->setHtmlCode('
-    <!DOCTYPE html>
-<html lang="en">
-
-<head>
     <style>
         #reader {
-            margin-top: 10rem;
-            height: 10rem;
+            position: fixed;
+            display: flex;
+            flex-direction: column;
+            bottom: 0.5rem;
+            left: 4.5rem;
+            
+            align-self: center;
+            height: 7rem;
+            z-index: 1000;
+            width: 90%;
             border-radius: 0.5rem;
             background-color: #0C0F0A;
         }
 
         #buttons {
-            position: absolute;
-            margin-top: 1rem;
+            position: relative;
             left: 42%;
+            top: -3.5rem;
             display: flex;
             flex-direction: row;
             justify-content: space-between;
             width: 20rem;
-            height: 4rem;
         }
 
         #informations {
-            position: absolute;
+            position: relative;
             left: 1rem;
-            padding-top: 2.5rem;
+            top: 1.5rem;
             color: white;
             margin-top: auto;
             margin-bottom: auto;
@@ -144,9 +147,9 @@ class AppFixtures extends Fixture
             height: 3rem;
             width: 30rem;
             left: 35%;
-            margin-top: 6rem;
+            top: -3rem;
             justify-content: space-around;
-            position: absolute;
+            position: relative;
             color: white;
         }
 
@@ -380,10 +383,7 @@ class AppFixtures extends Fixture
                 }
             });
         }
-    </script>
-</body>
-
-</html>');
+    </script>');
         $manager->persist($reader);
 
         $manager->flush();
