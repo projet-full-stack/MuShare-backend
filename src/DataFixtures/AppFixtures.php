@@ -97,6 +97,10 @@ class AppFixtures extends Fixture
         //Reader
         $reader = new Reader();
         $reader->setHtmlCode('
+    <!DOCTYPE html>
+<html lang="en">
+
+<head>
     <style>
         #reader {
             margin-top: 10rem;
@@ -280,12 +284,16 @@ class AppFixtures extends Fixture
             }
         }
     </style>
+
+</head>
+
+<body>
     <div id="reader">
         <div id="informations">
             <p>
-                <span id="song">Here Comes The Sun - REMASTERED</span>
+                <span id="song">{:songTitle}</span>
                 <br>
-                <span id="autor">The Beatles</span>
+                <span id="author">{:songAuthor}</span>
             </p>
         </div>
         <div id="buttons">
@@ -313,7 +321,7 @@ class AppFixtures extends Fixture
         <div id="musicReader">
             <span id="elapsed">0:00</span>
             <audio id="audio" onloadeddata="correctInfo()" hidden
-                src="Elden Ring Main Theme (The Final Battle)  EPIC VERSION.mp3"></audio>
+                src="{:songPath}"></audio>
             <div class="wrapper">
                 <input id="timeInput" type="range" min="0" value="0">
             </div>
@@ -372,7 +380,10 @@ class AppFixtures extends Fixture
                 }
             });
         }
-    </script>');
+    </script>
+</body>
+
+</html>');
         $manager->persist($reader);
 
         $manager->flush();
