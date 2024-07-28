@@ -2,6 +2,7 @@
 
 namespace App\DataFixtures;
 
+use App\Entity\DownloadedFile;
 use App\Entity\Follow;
 use App\Entity\Like;
 use App\Entity\Playlist;
@@ -56,6 +57,12 @@ class AppFixtures extends Fixture
             $song->setOwner($users[array_rand($users)]);
             $song->setTitle($this->faker->word())->setStatus("on")->setCreatedAt($created)->setUpdatedAt($updated)->setAuthor($this->faker->name());
             array_push($songs, $song);
+
+            $file = new DownloadedFile();
+            $file->setCreatedAt($created)->setUpdatedAt($updated)->setPublicPath("public")->setRealPath("files/song");
+            $file->setSong($song);
+            $file->setRealName($this->faker->word() . "." . $this->faker->fileExtension())->setMimeType("audio/mpeg")->setFileSize(0)->setStatus("on");
+            $manager->persist($file);
             $manager->persist($song);
         }
 

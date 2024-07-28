@@ -48,11 +48,14 @@ class SongController extends AbstractController
     {
         $song = $songRepository->find($songId);
         $downloadedFile = $song->getDownloadedFile();
+        
         $location = $downloadedFile->getPublicPath() . '/' . $downloadedFile->getRealPath();
         $location = $urlGenerator->generate("app_song", [], UrlGeneratorInterface::ABSOLUTE_URL);
         $location = $location . str_replace("/public/", "", $downloadedFile->getPublicPath() . '/' . $downloadedFile->getRealPath());
         $jsonSong = $serializer->serialize($song, 'json', ['groups' => 'song']);
-        return new JsonResponse($jsonSong, JsonResponse::HTTP_OK, ["Location" => $location], true);
+        $jsonSong = json_decode($jsonSong);
+        $jsonSong->location = $location;
+        return new JsonResponse($jsonSong, JsonResponse::HTTP_OK, ["Location" => $location]);
     }
 
     #[Route('/api/songs', name: 'song.create', methods: ['POST'])]
