@@ -12,6 +12,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 use Symfony\Component\Serializer\SerializerInterface;
+use Symfony\Component\Cache\Adapter\FilesystemAdapter;
 
 class PlaylistController extends AbstractController
 {
@@ -25,19 +26,29 @@ class PlaylistController extends AbstractController
     }
 
     #[Route('/api/playlist', name: 'playlist.getAll', methods: ['GET'])]
-    public function getAllSongs(PlaylistRepository $playlistRepository, SerializerInterface $serializer): JsonResponse
+    public function getAllSongs(): JsonResponse
     {
+        $cache = new FilesystemAdapter();
+        
+        $value = $cache->get('cache', function(PlaylistRepository $playlistRepository, SerializerInterface $serializer) {
         $playlist = $playlistRepository->findAll();
         $jsonPlaylist = $serializer->serialize($playlist, 'json', ['groups' => 'playlist']);
         return new JsonResponse($jsonPlaylist, JsonResponse::HTTP_OK, [], true);
+    });
+    return $value;
     }
 
     #[Route('/api/playlist/{playlistId}', name: 'playlist.get', methods: ['GET'])]
-    public function getOneSong($playlistId, PlaylistRepository $playlistRepository, SerializerInterface $serializer): JsonResponse
+    public function getOneSong(): JsonResponse
     {
+        $cache = new FilesystemAdapter();
+        
+        $value = $cache->get('cache', function($playlistId, PlaylistRepository $playlistRepository, SerializerInterface $serializer) {
         $song = $playlistRepository->find($playlistId);
         $jsonPlaylist = $serializer->serialize($song, 'json', ['groups' => 'playlist']);
         return new JsonResponse($jsonPlaylist, JsonResponse::HTTP_OK, [], true);
+    });
+    return $value;
     }
 
     // #[Route('/api/playlist', name: 'playlist.create', methods: ['POST'])]
