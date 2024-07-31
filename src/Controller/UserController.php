@@ -47,6 +47,14 @@ class UserController extends AbstractController
         return new JsonResponse($jsonUser, JsonResponse::HTTP_OK, [], true);
     }
 
+    #[Route('/api/users/username/{userName}', name: 'user.getOneByName', methods: ['GET'])]
+    public function getOneUserIdByName($userName, EntityManagerInterface $entityManager, SerializerInterface $serializer): JsonResponse
+    {
+        $user = $entityManager->getRepository(User::class)->findOneBy(["username" => $userName]);
+        $jsonUser = $serializer->serialize($user, 'json', ['groups' => 'username']);
+        return new JsonResponse($jsonUser, JsonResponse::HTTP_OK, [], true);
+    }
+
     #[Route('/register', name: 'user.create', methods: ['POST'])]
     public function createUser(Request $req, UserPasswordHasherInterface $userPasswordHasher,EntityManagerInterface $entityManager, SerializerInterface $serializer): JsonResponse
     {
@@ -71,7 +79,7 @@ class UserController extends AbstractController
         $user->setUsername($data['username']);
         $user->setUpdatedAt(new \DateTime());
         $entityManager->flush();
-        $jsonUser = $serializer->serialize($user, 'json');
+        $jsonUser = $serializer->serialize($user, 'json', ['groups' => 'user']);
         return new JsonResponse($jsonUser, JsonResponse::HTTP_OK, [], true);
     }
 

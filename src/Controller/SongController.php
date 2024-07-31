@@ -16,6 +16,7 @@ use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 use Symfony\Component\Serializer\SerializerInterface;
 use DateTime;
 use Symfony\Component\Cache\Adapter\FilesystemAdapter;
+use Symfony\Contracts\Cache\ItemInterface;
 
 class SongController extends AbstractController
 {
@@ -31,11 +32,11 @@ class SongController extends AbstractController
     }
 
     #[Route('/api/songs', name: 'song.getAll', methods: ['GET'])]
-    public function getAllSongs(): JsonResponse
+    public function getAllSongs(SongRepository $songRepository, SerializerInterface $serializer): JsonResponse
     {
         $cache = new FilesystemAdapter();
-        $value = $cache->get('cache', function(SongRepository $songRepository, SerializerInterface $serializer) {
-
+        $value = $cache->get('allSong', function (ItemInterface $itemInterface) use ($songRepository, $serializer) {
+            $itemInterface->expiresAfter(15);
             $songs = $songRepository->findAll();
             $jsonSongs = $serializer->serialize($songs, 'json', ['groups' => 'song']);
             return new JsonResponse($jsonSongs, JsonResponse::HTTP_OK, [], true);
@@ -47,36 +48,37 @@ class SongController extends AbstractController
     public function getLastTenSongs(SongRepository $songRepository, SerializerInterface $serializer): JsonResponse
     {
         $cache = new FilesystemAdapter();
-        $value = $cache->get('cache', function(SongRepository $songRepository, SerializerInterface $serializer) {
-        $songs = $songRepository->findLastTenSong();
-        $jsonSongs = $serializer->serialize($songs, 'json', ['groups' => 'song']);
-        return new JsonResponse($jsonSongs, JsonResponse::HTTP_OK, [], true);
-    });
-    return $value;
+        $value = $cache->get('tenLast1', function (ItemInterface $itemInterface) use ($songRepository, $serializer) {
+            $itemInterface->expiresAfter(15);
+            $songs = $songRepository->findLastTenSong();
+            $jsonSongs = $serializer->serialize($songs, 'json', ['groups' => 'song']);
+            return new JsonResponse($jsonSongs, JsonResponse::HTTP_OK, [], true);
+        });
+        return $value;
     }
 
     #[Route('/api/songs/{songId}', name: 'song.get', methods: ['GET'])]
-    public function getOneSong(): JsonResponse
+    public function getOneSong($songId, SongRepository $songRepository, UrlGeneratorInterface $urlGenerator, SerializerInterface $serializer): JsonResponse
     {
         $cache = new FilesystemAdapter();
-        $value = $cache->get('cache', function($songId, SongRepository $songRepository,UrlGeneratorInterface $urlGenerator, SerializerInterface $serializer) {
-        
-        $song = $songRepository->find($songId);
-        $downloadedFile = $song->getDownloadedFile();
-        
-        $location = $downloadedFile->getPublicPath() . '/' . $downloadedFile->getRealPath();
-        $location = $urlGenerator->generate("app_song", [], UrlGeneratorInterface::ABSOLUTE_URL);
-        $location = $location . str_replace("/public/", "", $downloadedFile->getPublicPath() . '/' . $downloadedFile->getRealPath());
-        $jsonSong = $serializer->serialize($song, 'json', ['groups' => 'song']);
-        $jsonSong = json_decode($jsonSong);
-        $jsonSong->location = $location;
-        return new JsonResponse($jsonSong, JsonResponse::HTTP_OK, ["Location" => $location]);
-    });
-    return $value;
+        $value = $cache->get('songById1' . $songId, function (ItemInterface $itemInterface) use ($songRepository, $serializer, $songId, $urlGenerator) {
+            $itemInterface->expiresAfter(15);
+            $song = $songRepository->find($songId);
+            $downloadedFile = $song->getDownloadedFile();
+
+            $location = $downloadedFile->getPublicPath() . '/' . $downloadedFile->getRealPath();
+            $location = $urlGenerator->generate("app_song", [], UrlGeneratorInterface::ABSOLUTE_URL);
+            $location = $location . str_replace("/public/", "", $downloadedFile->getPublicPath() . '/' . $downloadedFile->getRealPath());
+            $jsonSong = $serializer->serialize($song, 'json', ['groups' => 'song']);
+            $jsonSong = json_decode($jsonSong);
+            $jsonSong->location = $location;
+            return new JsonResponse($jsonSong, JsonResponse::HTTP_OK, ["Location" => $location]);
+        });
+        return $value;
     }
 
     #[Route('/api/songs', name: 'song.create', methods: ['POST'])]
-    public function createSong(Request $req, EntityManagerInterface $entityManager,UrlGeneratorInterface $urlGenerator, UserRepository $userRepository, SerializerInterface $serializer): JsonResponse
+    public function createSong(Request $req, EntityManagerInterface $entityManager, UrlGeneratorInterface $urlGenerator, UserRepository $userRepository, SerializerInterface $serializer): JsonResponse
     {
         $file = new DownloadedFile();
         $song = new Song();
@@ -89,11 +91,11 @@ class SongController extends AbstractController
         $owner = $userRepository->find($req->request->get('owner'));
         $song->setOwner($owner);
         $song->setDownloadedFile($file);
-        
-        
+
+
         $files = $req->files->get('file');
         $file->setFile($files);
-        
+
         $file->setMimeType($files->getClientMimeType());
         $file->setRealName($files->getClientOriginalName());
         $file->setPublicPath('files/songs');
@@ -106,14 +108,14 @@ class SongController extends AbstractController
 
         $entityManager->persist($file);
         $entityManager->persist($song);
-        
+
         $entityManager->flush();
 
         $location = $file->getPublicPath() . '/' . $file->getRealPath();
         $location = $urlGenerator->generate("app_song", [], UrlGeneratorInterface::ABSOLUTE_URL);
         $location = $location . str_replace("/public/", "", $file->getPublicPath() . '/' . $file->getRealPath());
 
-        $jsonSong = $serializer->serialize($song, 'json', ['groups' => 'song']);   
+        $jsonSong = $serializer->serialize($song, 'json', ['groups' => 'song']);
         return new JsonResponse($jsonSong, JsonResponse::HTTP_CREATED, ["Location" => $location], true);
     }
 
@@ -121,8 +123,7 @@ class SongController extends AbstractController
     public function updateSong(Request $req, Song $song, SerializerInterface $serializer, EntityManagerInterface $entityManager): JsonResponse
     {
         $updatedSong = $serializer->deserialize($req->getContent(), Song::class, 'json', [AbstractNormalizer::OBJECT_TO_POPULATE => $song]);
-        if(isset($req->toArray()['delete']))
-        {
+        if (isset($req->toArray()['delete'])) {
             $updatedSong->setStatus("off");
         }
 

@@ -26,7 +26,7 @@ class DownloadedFile
     private ?string $realPath = null;
     
     #[ORM\Column(length: 255)]
-    #[Groups([ "downloadedFile"])]
+    #[Groups([ "downloadedFile", "song"])]
     private ?string $publicPath = null;
 
     #[ORM\Column(length: 255)]
