@@ -16,28 +16,25 @@ class SongRepository extends ServiceEntityRepository
         parent::__construct($registry, Song::class);
     }
 
-    public function findAllActive($userId, $status): array
+    public function findAllActive(): array
     {
-          return $this->createQueryBuilder('s')
-              ->andWhere('s.status = :status')
-              ->setParameter('status', $status)
-              ->andWhere('s.user = :userId')
-              ->setParameter('userId', $userId)
-              ->orderBy('s.id', 'ASC')
-              ->getQuery()
-              ->getResult()
-          ;
-      
+        return $this->createQueryBuilder('s')
+            ->andWhere('s.status = :status')
+            ->setParameter('status', "on")
+            ->orderBy('s.id', 'ASC')
+            ->getQuery()
+            ->getResult();
     }
 
     public function findLastTenSong(): array
     {
         return $this->createQueryBuilder('s')
+            ->andWhere('s.status = :status')
+            ->setParameter('status', "on")
             ->orderBy('s.id', 'DESC')
             ->setMaxResults(10)
             ->getQuery()
-            ->getResult()
-        ;
+            ->getResult();
     }
 
     //    /**

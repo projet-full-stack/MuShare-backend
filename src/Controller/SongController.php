@@ -35,9 +35,9 @@ class SongController extends AbstractController
     public function getAllSongs(SongRepository $songRepository, SerializerInterface $serializer): JsonResponse
     {
         $cache = new FilesystemAdapter();
-        $value = $cache->get('allSong', function (ItemInterface $itemInterface) use ($songRepository, $serializer) {
+        $value = $cache->get('allSong1', function (ItemInterface $itemInterface) use ($songRepository, $serializer) {
             $itemInterface->expiresAfter(15);
-            $songs = $songRepository->findAll();
+            $songs = $songRepository->findAllActive();
             $jsonSongs = $serializer->serialize($songs, 'json', ['groups' => 'song']);
             return new JsonResponse($jsonSongs, JsonResponse::HTTP_OK, [], true);
         });
@@ -131,7 +131,8 @@ class SongController extends AbstractController
         $entityManager->persist($updatedSong);
         $entityManager->flush();
 
-        $jsonSong = $serializer->serialize($song, 'json');
+        $jsonSong = $serializer->serialize($song, 'json', ['groups' => 'song']);    
         return new JsonResponse($jsonSong, JsonResponse::HTTP_OK, [], true);
     }
+
 }
