@@ -14,6 +14,7 @@ use Doctrine\Persistence\ObjectManager;
 use Faker\Factory;
 use Faker\Generator;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
+use Symfony\Component\Validator\Constraints\Length;
 
 class AppFixtures extends Fixture
 {
@@ -39,7 +40,7 @@ class AppFixtures extends Fixture
 
             $user->setUsername($username)
                  ->setEmail($email)
-                 ->setPassword($this->userPasswordHasher->hashPassword($user, 'password'))
+                 ->setPassword($this->userPasswordHasher->hashPassword($user, $password))
                  ->setCreatedAt($created)
                  ->setUpdatedAt($updated)
                  ->setStatus("on")
@@ -47,6 +48,21 @@ class AppFixtures extends Fixture
             array_push($users, $user);
             $manager->persist($user);
         }
+
+        $user1 = new User();
+        $created = $this->faker->dateTime();
+        $updated = $this->faker->dateTimeBetween($created, 'now');
+        $username = "FullStack";
+        $password = "passwordTest";
+        $email = "full.stack@gmail.com";
+        $user1->setUsername($username)
+        ->setEmail($email)
+        ->setPassword($this->userPasswordHasher->hashPassword($user1, $password))
+        ->setCreatedAt($created)
+        ->setUpdatedAt($updated)
+        ->setStatus("on")
+        ->setRoles(["ROLE_ADMIN", "ROLE_USER"]);
+    $manager->persist($user1);
 
         //Songs
         $songs = [];
@@ -65,6 +81,48 @@ class AppFixtures extends Fixture
             $manager->persist($file);
             $manager->persist($song);
         }
+
+        $song1 = new Song();
+        $created = $this->faker->dateTime();
+        $updated = $this->faker->dateTimeBetween($created, 'now');
+        $song1->setOwner($user1);
+        $song1->SetTitle("Deltarune - Queen");
+        $song1->setAuthor("Toby Fox");
+        $song1->setStatus("on")->setCreatedAt($created)->setUpdatedAt($updated);
+        $file = new DownloadedFile();
+        $file->setCreatedAt($created)->setUpdatedAt($updated)->setPublicPath("files/songs")->setRealPath("Deltarune Chapter 2 OST 05 Queen.mp3");
+        $file->setSong($song1);
+        $file->setRealName("Deltarune Chapter 2 OST 05 Queen.mp3")->setMimeType("audio/mpeg")->setFileSize(0)->setStatus("on");
+        $manager->persist($file);
+        $manager->persist($song1);
+
+        $song2 = new Song();
+        $created = $this->faker->dateTime();
+        $updated = $this->faker->dateTimeBetween($created, 'now');
+        $song2->setOwner($user1);
+        $song2->SetTitle("Pokémon Rubis/Saphir - Vergazon");
+        $song2->setAuthor("Game Freak");
+        $song2->setStatus("on")->setCreatedAt($created)->setUpdatedAt($updated);
+        $file = new DownloadedFile();
+        $file->setCreatedAt($created)->setUpdatedAt($updated)->setPublicPath("files/songs")->setRealPath("Verdanturf Town Pokémon Ruby Pokémon Sapphire OST.mp3");
+        $file->setSong($song2);
+        $file->setRealName("Verdanturf Town Pokémon Ruby Pokémon Sapphire OST.mp3")->setMimeType("audio/mpeg")->setFileSize(0)->setStatus("on");
+        $manager->persist($file);
+        $manager->persist($song2);
+
+        $song3 = new Song();
+        $created = $this->faker->dateTime();
+        $updated = $this->faker->dateTimeBetween($created, 'now');
+        $song3->setOwner($user1);
+        $song3->SetTitle("Pokémon Noire/Blanche - Route 12");
+        $song3->setAuthor("Game Freak");
+        $song3->setStatus("on")->setCreatedAt($created)->setUpdatedAt($updated);
+        $file = new DownloadedFile();
+        $file->setCreatedAt($created)->setUpdatedAt($updated)->setPublicPath("files/songs")->setRealPath("Winter Pokémon Black Pokémon White OST.mp3");
+        $file->setSong($song3);
+        $file->setRealName("Winter Pokémon Black Pokémon White OST.mp3")->setMimeType("audio/mpeg")->setFileSize(0)->setStatus("on");
+        $manager->persist($file);
+        $manager->persist($song3);
 
         //Playlists
         $playlists = [];
